@@ -1,3 +1,14 @@
+This is just a easy-to-develop fork.
+
+Use `npm install & bower install` to install dependencies.
+Then run `gulp serve` to try it.
+
+Run `gulp test` to execute unit test with Karma and Jasmine. 
+Run `gulp simple-build` to build(copy).
+
+The contents below is the origin info.
+===============================
+
 # RDash rdash-angular
 ## Responsive, bloat free, bootstrap powered admin style dashboard!
 [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/rdash/rdash-angular?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)

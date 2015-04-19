@@ -44,5 +44,8 @@ Icon
 # Node modules
 /node_modules
 
-# Bower components
-/src/components
+# Bower bower_components
+/src/bower_components
+
+# WebStorm configurations
+/.idea

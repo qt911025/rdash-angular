@@ -1,0 +1,5 @@
+<div class="row alerts-container" ng-controller="AlertsCtrl" ng-show="alerts.length">
+    <div class="col-xs-12">
+        <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
+    </div>
+</div>
