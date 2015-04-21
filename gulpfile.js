@@ -40,19 +40,29 @@ gulp.task('build-css', ['clean-css'], function () {
     .pipe(gulp.dest('src/'));
 });
 
+
+gulp.task('lint', function(){
+  gulp.src([
+    'src/**/*.js',
+    '!src/bower_components/**/*'
+  ])
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('jshint-stylish'))
+});
+
 /**
  * inject and lint
  */
-gulp.task('inject-js', function(){
+gulp.task('inject-js', ['lint'], function(){
   gulp.src('src/index.html')
     .pipe($.inject(
       gulp.src([
         'src/**/*.js',
         '!src/bower_components/**/*',
         '!src/**/*.spec.js'
-      ])
-        .pipe($.jshint())
-        .pipe($.jshint.reporter('jshint-stylish'))
+      ], {
+        read: false
+      })
       , {
         relative: true
       }))
