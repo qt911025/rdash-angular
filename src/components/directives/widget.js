@@ -8,6 +8,7 @@ angular
 
 function rdWidget() {
   return {
+    replace: true,
     transclude: true,
     template: '<div class="widget" ng-transclude></div>',
     restrict: 'EA'

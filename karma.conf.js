@@ -30,7 +30,8 @@ module.exports = function(config) {
       'src/bower_components/angular-bootstrap/ui-bootstrap.js',
       'src/app.js',
       'src/business/**/*.js',
-      'src/components/**/*.js'
+      'src/components/**/*.js',
+      'src/**/*.html'
     ],
 
     preprocessors: {

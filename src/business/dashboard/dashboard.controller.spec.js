@@ -6,11 +6,21 @@
 
 describe('Controller: Dashboard', function(){
 
+  var DashboardCtrl, scope;
+
   beforeEach(module('RDash'));
-  beforeEach(module('app/dashboard/dashboard.html'));
+  beforeEach(module('business/dashboard/dashboard.html'));
+
+  beforeEach(inject(function($controller, $rootScope){
+
+    scope = $rootScope.$new();
+    DashboardCtrl = $controller('DashboardCtrl', {
+      $scope: scope
+    });
+  }));
 
   it('should do something', function(){
-    expect(1).toBe(1);
+    expect(scope.message).toBe('Hello RDash!');
   })
 
 });

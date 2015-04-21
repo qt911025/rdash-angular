@@ -8,6 +8,7 @@ angular
 
 function rdWidgetTitle() {
   return {
+    replace: true,
     requires: '^rdWidget',
     scope: {
       title: '@',

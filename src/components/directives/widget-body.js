@@ -8,6 +8,7 @@ angular
 
 function rdWidgetBody() {
   return {
+    replace: true,
     requires: '^rdWidget',
     scope: {
       loading: '@?',

@@ -8,6 +8,7 @@ angular
 
 function rdWidgetFooter() {
   return {
+    replace: true,
     requires: '^rdWidget',
     transclude: true,
     template: '<div class="widget-footer" ng-transclude></div>',
