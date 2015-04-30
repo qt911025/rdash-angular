@@ -4,12 +4,11 @@ var gulp = require('gulp'),
   $ = require('gulp-load-plugins')(),
   mainBowerFiles = require('main-bower-files'),
   open = require('open'),
-  karmaServer = require('karma').server;
+  karmaServer = require('karma').server,
+  addStream = require('add-stream'),
+  through2 = require('through2');
 
-gulp.task('clean-dist', function(){
-  return gulp.src('dist', {read: false})
-    .pipe($.clean());
-});
+var mainModuleName = 'RDash';
 
 gulp.task('clean-css', function(){
   return gulp.src('src/app.css', {read: false})
@@ -71,13 +70,14 @@ gulp.task('inject-js', ['lint'], function(){
 
 gulp.task('inject', ['build-css', 'inject-js'], function () {
   return gulp.src('src/index.html')
-    .pipe($.inject(gulp.src(
-      mainBowerFiles(), {
-      read: false
-    }),{
-      name: 'bower',
-      relative: true
-    }))
+    .pipe($.inject(
+      gulp.src(
+        mainBowerFiles(), {
+          read: false
+        }), {
+        name: 'bower',
+        relative: true
+      }))
     .pipe($.inject(
       gulp.src([
         'src/**/*.css',
@@ -111,11 +111,53 @@ gulp.task('inject-karma', function () {
 });
 
 /**
- * Watch custom files
+ * Build project.
  */
-gulp.task('watch', function () {
-  gulp.watch(['src/**/*.less', '!src/bower_components/*'], ['build-css']);
-  gulp.watch(['src/**/*.js', '!src/bower_components/*'], ['inject-js']);
+
+gulp.task('clean-dist', function(){
+  return gulp.src('dist', {read: false})
+    .pipe($.clean());
+});
+
+gulp.task('copy-assets', ['clean-dist'], function(){
+  return gulp.src('src/assets/**/*', {
+      base: 'src/'
+    })
+    .pipe(gulp.dest('dist/'));
+});
+
+gulp.task('copy-fonts', ['clean-dist'], function(){
+  return $.merge(
+    gulp.src('src/bower_components/rdash-ui/dist/fonts/**/*'),
+    gulp.src('src/bower_components/font-awesome/fonts/**/*'),
+    gulp.src('src/bower_components/bootstrap/fonts/**/*')
+  ).pipe(gulp.dest('dist/fonts/'));
+});
+
+gulp.task('usemin', ['copy-assets', 'copy-fonts', 'inject'], function() {
+  return gulp.src('src/index.html')
+    .pipe($.usemin({
+      bowerJs: ['concat', $.uglify(), $.rev()],
+      js: [
+        addStream.obj(
+          gulp.src(['src/**/*.html', '!src/index.html'])
+            .pipe($.minifyHtml({
+              empty: true,
+              spare: true
+            }))
+            .pipe($.ngTemplates({
+              module: mainModuleName,
+              standalone: false
+            }))
+        ),
+        $.ngAnnotate(),
+        'concat',
+        $.uglify(),
+        $.rev()],
+      bowerCss: ['concat'/*, $.minifyCss({keepSpecialComments: 0})*/, $.rev()],
+      css: ['concat'/*, $.minifyCss({keepSpecialComments: 0})*/, $.rev()]
+    }))
+    .pipe(gulp.dest('dist/'));
 });
 
 /**
@@ -128,14 +170,16 @@ gulp.task('devServer', ['inject'], function () {
     port: 9000
   });
 });
-gulp.task('prodServer', function () {
-  $.connect.server({
-    root: 'dist',
-    port: 9000
-  });
+
+/**
+ * Watch custom files
+ */
+gulp.task('watch', ['devServer'], function () {
+  gulp.watch(['src/**/*.less', '!src/bower_components/*'], ['build-css']);
+  gulp.watch(['src/**/*.js', '!src/bower_components/*'], ['inject-js']);
 });
 
-gulp.task('livereload', function () {
+gulp.task('livereload', ['devServer'], function () {
   gulp.src([
     'src/**/*.html',
     'src/app.css',
@@ -147,12 +191,22 @@ gulp.task('livereload', function () {
     .pipe($.connect.reload())
 });
 
-gulp.task('wait', ['devServer'], function(cb){
-  gulp.run(['livereload', 'watch']);
+gulp.task('wait', ['watch', 'livereload'], function(cb){
   setTimeout(function(){
     cb();
   }, 1500)
 });
+
+/**
+ * Production serve
+ */
+gulp.task('prodServer', ['usemin'], function () {
+  $.connect.server({
+    root: 'dist',
+    port: 9000
+  });
+});
+
 
 /**
  * Gulp tasks
@@ -166,28 +220,8 @@ gulp.task('test', ['inject', 'inject-karma'], function(done){
     singleRun: true
   }, done);
 });
-gulp.task('simple-build', ['clean-dist', 'inject'], function () {
-  $.merge(
-    gulp.src([
-      'src/**/*.html',
-      'src/app.css',
-      'src/**/*.js',
-      'src/assets/**/*',
-      'src/bower_components/**/*',
-      'src/bower_components/rdash-ui/**/*',//Why should this exist?
-      '!src/**/*.spec.js'
-    ], {
-      base: 'src/'
-    }),
-    gulp.src([
-      'bower.json'
-    ])
-  )
-    .pipe(gulp.dest('dist/'));
-});
 
-//TODO ng-tpl ng-annotates usemin ocncat uglify
-//gulp.task('build', ['usemin', 'build-assets', 'build-custom']);
-gulp.task('default', ['simple-build'], function(){
-  gulp.run(['prodServer']);
+gulp.task('build', ['usemin']);
+gulp.task('default', ['prodServer'], function(){
+
 });

@@ -21,6 +21,6 @@ describe('Controller: Dashboard', function(){
 
   it('should do something', function(){
     expect(scope.message).toBe('Hello RDash!');
-  })
+  });
 
 });
