@@ -154,8 +154,8 @@ gulp.task('usemin', ['copy-assets', 'copy-fonts', 'inject'], function() {
         'concat',
         $.uglify(),
         $.rev()],
-      bowerCss: ['concat'/*, $.minifyCss({keepSpecialComments: 0})*/, $.rev()],
-      css: ['concat'/*, $.minifyCss({keepSpecialComments: 0})*/, $.rev()]
+      bowerCss: ['concat', $.minifyCss({keepSpecialComments: 0}), $.rev()],
+      css: ['concat', $.minifyCss({keepSpecialComments: 0}), $.rev()]
     }))
     .pipe(gulp.dest('dist/'));
 });
